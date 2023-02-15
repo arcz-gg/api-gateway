@@ -1,26 +1,20 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserAuthDto } from './dto/create-user-auth.dto';
-import { UpdateUserAuthDto } from './dto/update-user-auth.dto';
+import { Inject, Injectable } from '@nestjs/common';
+import { ClientKafka } from '@nestjs/microservices';
+
+import { CreateAccountDto } from './dto/create-user-auth.dto';
 
 @Injectable()
-export class UserAuthService {
-  create(createUserAuthDto: CreateUserAuthDto) {
-    return 'This action adds a new userAuth';
-  }
+class UserAuthService {
+	constructor(
+		@Inject('AUTH_MICROSERVICE') private readonly authClient: ClientKafka,
+	) {}
 
-  findAll() {
-    return `This action returns all userAuth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} userAuth`;
-  }
-
-  update(id: number, updateUserAuthDto: UpdateUserAuthDto) {
-    return `This action updates a #${id} userAuth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} userAuth`;
-  }
+	create(createAccountDto: CreateAccountDto): any {
+		return this.authClient.emit(
+			'create_user',
+			JSON.stringify(createAccountDto),
+		);
+	}
 }
+
+export { UserAuthService };
