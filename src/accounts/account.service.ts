@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 
-import { CreateAccountDto } from './dto/create-user-auth.dto';
+import { CreateAccountDto } from './dto/create-account.dto';
 
 @Injectable()
 class UserAuthService {
