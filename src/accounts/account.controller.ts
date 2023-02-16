@@ -2,16 +2,27 @@ import {
 	Controller,
 	Post,
 	Body,
+    Type,
 } from '@nestjs/common';
-import { UserAuthService } from './account.service';
+import { AccountService } from './account.service';
 import { CreateAccountDto } from './dto/create-account.dto';
 
-@Controller('user-auth')
-export class UserAuthController {
-	constructor(private readonly userAuthService: UserAuthService) {}
+const getControllerClass = ({ createPath, basePath }): Type<unknown> => {
 
-	@Post()
-	create(@Body() createAccountDto: CreateAccountDto) {
-		return this.userAuthService.create(createAccountDto);
+
+	@Controller([basePath])
+	class UserAuthController {
+		constructor(private readonly userAuthService: AccountService) {}
+
+		@Post([createPath])
+		create(@Body() createAccountDto: CreateAccountDto) {
+			return this.userAuthService.create(createAccountDto);
+		}
 	}
+
+	return UserAuthController;
+}
+
+export {
+		getControllerClass
 }

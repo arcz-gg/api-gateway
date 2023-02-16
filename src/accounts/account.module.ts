@@ -1,28 +1,36 @@
-import { Module } from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { UserAuthService } from './account.service';
-import { UserAuthController } from './account.controller';
+import { getControllerClass } from './account.controller';
+import { AccountService } from './account.service';
 
-@Module({
-	imports: [
-		ClientsModule.register([
-			{
-				name: 'AUTH_MICROSERVICE',
-				transport: Transport.KAFKA,
-				options: {
-					client: {
-						clientId: 'auth',
-						brokers: ['localhost:9092'],
-					},
-					producerOnlyMode: true,
-					consumer: {
-						groupId: 'auth-consumer',
-					},
-				},
-			},
-		]),
-	],
-	controllers: [UserAuthController],
-	providers: [UserAuthService],
-})
-export class UserAuthModule {}
+@Module({})
+export class UserAuthModule {
+	static register(config: { createPath: string, basePath: string }): DynamicModule {
+
+		const { createPath, basePath } = config;
+		const AccountController = getControllerClass({ basePath, createPath });
+		return {
+			module: UserAuthModule,
+			providers: [AccountService],
+			controllers: [AccountController],
+			imports: [
+				ClientsModule.register([
+					{
+						name: 'AUTH_MICROSERVICE',
+						transport: Transport.KAFKA,
+						options: {
+							client: {
+								clientId: 'auth',
+								brokers: ['localhost:9092'],
+							},
+							producerOnlyMode: true,
+							consumer: {
+								groupId: 'auth-consumer'
+							}
+						}
+					}
+				])
+			]
+		}
+	}
+}
